@@ -2,13 +2,23 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import {firestore} from '../firebase';
-import {Box, Typography, Modal, Stack, TextField, Button} from '@mui/material'
+import {Box, Typography, Modal, Stack, TextField, Button, createTheme, ThemeProvider, CssBaseline} from '@mui/material'
 import {collection, doc, deleteDoc, getDocs, getDoc, setDoc, query} from 'firebase/firestore'
-  
+// import "../../fonts/stylesheet.css" 
+// import '../public/stylesheet.css'
+
+import { Raleway } from '@next/font/google'
+const raleway = Raleway({
+  subsets: ['latin'],
+  weight: ['400'],
+  display: 'swap',
+})
 export default function Home() {
+
   const [inventory, setInventory] = useState([])
   const [open, setOpen] = useState(true)
   const [itemName, setItemName] = useState('')
+  const [search, setSearch] = useState('')
 
   const updateInventory = async () => {
   const snapshot = query(collection(firestore, 'inventory'))
@@ -65,8 +75,28 @@ export default function Home() {
     justifyContent="center" 
     flexDirection="column"
     alignItems="center"
-    bgcolor="#f0f0f0"
-    gap={5}>
+    bgcolor="#E2E9DA"
+    gap={5} 
+    className={raleway.className}>
+      <Box
+      position="absolute"
+      top="0"
+      height="60px"
+      width="100%"
+      bgcolor="#78954B"
+      textAlign="center"
+      alignContent="center"
+      sx={{boxShadow:"5px 5px 5px lightgray",
+        fontSize:"24px"
+      }}>
+        <Typography
+        varaint="h3"
+        color="#F9F5EC"
+        sx={{fontSize:"28px"
+        }}>
+          Inventory Management
+          </Typography>
+      </Box>
       <Modal open={open} onClose={handleClose}>
         <Box
         position="absolute"
@@ -104,7 +134,18 @@ export default function Home() {
 
         </Box>
       </Modal>
-     
+      <Stack 
+      direction="row"
+      spacing={2}>
+        <TextField 
+        variant="outlined"
+        fullWidth
+        value={itemName}
+        onChange={(e) => {
+          setItemName(e.target.value)
+          setSearch(e.target.value);
+        }}
+        placeholder="Search for items"></TextField>
       <Button 
       variant="contained"
       onClick={() => {
@@ -112,19 +153,26 @@ export default function Home() {
       }}>
         Add new item
       </Button>
+      </Stack>
       <Box border="1px solid #333">
         <Box 
         width="800px" 
         height="100px" 
-        bgcolor="#ADD8E6"
+        bgcolor="#78954B"
         display="flex"
         alignItems="center"
-        justifyContent="center">
-          <Typography variant="h2" color="#333">Inventory Items</Typography>
+        justifyContent="center"
+        sx={{borderRadius:"5px"}}>
+          <Typography variant="h2" color="#333">Track Items</Typography>
         
       </Box>
       <Stack width="800px" height="300px" spacing={2} overflow="auto">
-        {inventory.map(({name, quantity}) => (
+        {inventory
+        .filter((item) => {
+          return search.toLowerCase() === '' 
+            ? true : item.name.toLowerCase().includes(search);
+        })
+        .map(({name, quantity}) => (
           <Box key={name}
           width="100%"
           minHeight="150px"
@@ -148,7 +196,7 @@ export default function Home() {
             </Button>
             <Button variant="contained" onClick={() => {
               removeItem(name)
-            }}>Remove Item</Button>
+            }} color="#78954B">Remove Item</Button>
             </Stack>
           </Box>
         ))}

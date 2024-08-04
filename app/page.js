@@ -4,10 +4,15 @@ import { useState, useEffect } from "react";
 import {firestore} from '../firebase';
 import {Box, Typography, Modal, Stack, TextField, Button, createTheme, ThemeProvider, CssBaseline} from '@mui/material'
 import {collection, doc, deleteDoc, getDocs, getDoc, setDoc, query} from 'firebase/firestore'
-// import "../../fonts/stylesheet.css" 
-// import '../public/stylesheet.css'
+import "../public/style.css"
 
-import { Raleway } from '@next/font/google'
+import { Raleway } from "next/font/google"
+const hoverButton = {
+  "&:hover": {
+    bgcolor:"#405835"
+  }
+}
+
 const raleway = Raleway({
   subsets: ['latin'],
   weight: ['400'],
@@ -19,6 +24,11 @@ export default function Home() {
   const [open, setOpen] = useState(true)
   const [itemName, setItemName] = useState('')
   const [search, setSearch] = useState('')
+
+  // set hover effect for button
+  // const buttons = () => {
+  //   const [isHovered, setIsHovered] = useState('')
+  // }
 
   const updateInventory = async () => {
   const snapshot = query(collection(firestore, 'inventory'))
@@ -77,8 +87,8 @@ export default function Home() {
     alignItems="center"
     bgcolor="#E2E9DA"
     gap={5} 
-    className={raleway.className}>
-      <Box
+    className={raleway.className}> 
+      <Box               
       position="absolute"
       top="0"
       height="60px"
@@ -113,11 +123,11 @@ export default function Home() {
         display="flex"
         flexDirection="column"
         gap={3}>
-          <Typography variant="h6" color="black">Add Item</Typography>
+          <Typography variant="h6" color="black" >Add Item</Typography>
           <Stack width="100%" direction="row" spacing={2}>
             <TextField 
               variant="outlined"
-              fullWidth
+              sx={{width:"250px"}}
               value={itemName}
               onChange={(e) => {
                 setItemName(e.target.value)
@@ -129,17 +139,38 @@ export default function Home() {
                 setItemName('')
                 handleClose()
               }}
-                >Add</Button>
+              className='button'>Add</Button>
           </Stack>
 
         </Box>
       </Modal>
-      <Stack 
+      <Box border="0 solid #333"
+      padding={2}
+      sx={{borderRadius:"8px",
+        boxShadow:"3px 3px 10px 4px #d3d3d3"
+      }}>
+        <Box 
+        width="800px" 
+        height="100px" 
+        bgcolor="#78954B"
+        display="flex"
+        justifyContent="flex-start"
+        padding={5}
+        sx={{borderRadius:"5px",
+          marginBottom:"5px"
+        }}>
+          <Stack 
       direction="row"
-      spacing={2}>
+      spacing={2}
+      alignItems="center"
+      >
         <TextField 
         variant="outlined"
         fullWidth
+        sx={{width:"400px",
+          bgcolor:"#E2E9DA",
+          color:"#405835",
+        }}
         value={itemName}
         onChange={(e) => {
           setItemName(e.target.value)
@@ -150,23 +181,17 @@ export default function Home() {
       variant="contained"
       onClick={() => {
         handleOpen()
+      }}
+      className="button"
+      sx={{width:"200px",
+        height:"40px",
       }}>
         Add new item
       </Button>
       </Stack>
-      <Box border="1px solid #333">
-        <Box 
-        width="800px" 
-        height="100px" 
-        bgcolor="#78954B"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        sx={{borderRadius:"5px"}}>
-          <Typography variant="h2" color="#333">Track Items</Typography>
         
       </Box>
-      <Stack width="800px" height="300px" spacing={2} overflow="auto">
+      <Stack width="800px" height="500px" spacing={2} overflow="auto">
         {inventory
         .filter((item) => {
           return search.toLowerCase() === '' 
@@ -175,12 +200,16 @@ export default function Home() {
         .map(({name, quantity}) => (
           <Box key={name}
           width="100%"
-          minHeight="150px"
+          minHeight="130px"
+          alignSelf="center"
           display="flex"
           alignItems="center"
           justifyContent="space-between"
           bgcolor="#f0f0f0"
-          padding={5}>
+          padding={5}
+          sx={{margin:"5px",
+            borderRadius:"5px"
+          }}>
             <Typography variant="h3" color="#333" textAlign="center">
               {name.charAt(0).toUpperCase() + name.slice(1)}
             </Typography>
@@ -191,12 +220,18 @@ export default function Home() {
             <Button
             variant="contained" onClick={() => {
               addItem(name)
-            }}>
+            }} 
+            sx={{bgcolor:"#78954B"
+            }}
+            className="button">
               Add
             </Button>
             <Button variant="contained" onClick={() => {
               removeItem(name)
-            }} color="#78954B">Remove Item</Button>
+            }} sx={{bgcolor:"#78954B",
+              boxShadow:"6px 6px 5px 5px #d7d7d7",
+            }}
+            className="button">Remove Item</Button>
             </Stack>
           </Box>
         ))}
